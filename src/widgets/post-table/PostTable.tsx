@@ -3,6 +3,8 @@ import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../shared/ui"
 import { Post, User } from "../../entities/post"
 import React from "react"
+import { useQuery } from "@tanstack/react-query"
+import { userApi } from "../../services/api"
 
 interface PostTableProps {
   posts: Post[]
@@ -34,20 +36,29 @@ const PostTable = ({
   searchQuery,
   onDeletePost,
 }: PostTableProps) => {
+  const [selectedUserId, setSelectedUserId] = React.useState<number | null>(null)
+
+  const { data: userData } = useQuery({
+    queryKey: ["user", selectedUserId],
+    queryFn: () => (selectedUserId ? userApi.getUser(selectedUserId) : null),
+    enabled: !!selectedUserId,
+  })
+
+  React.useEffect(() => {
+    if (userData) {
+      setSelectedUser(userData)
+      setShowUserModal(true)
+      setSelectedUserId(null)
+    }
+  }, [userData, setSelectedUser, setShowUserModal])
+
   const openPostDetail = (post: Post) => {
     setSelectedPost(post)
     setShowPostDetailDialog(true)
   }
 
-  const openUserModal = async (user: User) => {
-    try {
-      const response = await fetch(`/api/users/${user.id}`)
-      const userData = await response.json()
-      setSelectedUser(userData)
-      setShowUserModal(true)
-    } catch (error) {
-      console.error("사용자 정보 가져오기 오류:", error)
-    }
+  const openUserModal = (user: User) => {
+    setSelectedUserId(user.id)
   }
 
   return (

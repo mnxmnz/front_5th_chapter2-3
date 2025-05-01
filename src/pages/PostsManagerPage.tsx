@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Plus } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -14,6 +14,7 @@ import { AddPostDialog, EditPostDialog, PostDetailDialog } from "../features/pos
 import { AddCommentDialog, EditCommentDialog } from "../features/comment-management/ui"
 import { UserModal } from "../features/user-management/ui"
 import { postApi, commentApi } from "../services/api"
+import { usePostStore } from "../features/post-management/model/postStore"
 
 interface Comment {
   id: number
@@ -24,17 +25,24 @@ interface Comment {
   likes: number
 }
 
+interface PostsResponse {
+  posts: Post[]
+  total: number
+  skip: number
+  limit: number
+}
+
 const PostsManager = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const queryParams = new URLSearchParams(location.search)
   const queryClient = useQueryClient()
+  const { posts: storePosts, selectedPost, setPosts, setSelectedPost, addPost, updatePost, deletePost } = usePostStore()
 
   // 상태 관리
   const [skip, setSkip] = useState(parseInt(queryParams.get("skip") || "0"))
   const [limit, setLimit] = useState(parseInt(queryParams.get("limit") || "10"))
   const [searchQuery, setSearchQuery] = useState(queryParams.get("search") || "")
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null)
   const [sortBy, setSortBy] = useState(queryParams.get("sortBy") || "")
   const [sortOrder, setSortOrder] = useState(queryParams.get("sortOrder") || "asc")
   const [showAddDialog, setShowAddDialog] = useState(false)
@@ -53,8 +61,7 @@ const PostsManager = () => {
   const [showUserModal, setShowUserModal] = useState(false)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
-  // URL 업데이트 함수
-  const updateURL = () => {
+  const updateURL = useCallback(() => {
     const params = new URLSearchParams()
     if (skip) params.set("skip", skip.toString())
     if (limit) params.set("limit", limit.toString())
@@ -63,10 +70,10 @@ const PostsManager = () => {
     if (sortOrder) params.set("sortOrder", sortOrder)
     if (selectedTag) params.set("tag", selectedTag)
     navigate(`?${params.toString()}`)
-  }
+  }, [skip, limit, searchQuery, sortBy, sortOrder, selectedTag, navigate])
 
   // 게시물 관련 쿼리
-  const { data: postsData, isLoading: isPostsLoading } = useQuery({
+  const { data: postsData, isLoading: isPostsLoading } = useQuery<PostsResponse>({
     queryKey: ["posts", { skip, limit, tag: selectedTag }],
     queryFn: () => (selectedTag ? postApi.getPostsByTag(selectedTag) : postApi.getPosts({ skip, limit })),
   })
@@ -80,8 +87,9 @@ const PostsManager = () => {
   // 게시물 관련 뮤테이션
   const addPostMutation = useMutation({
     mutationFn: postApi.addPost,
-    onSuccess: () => {
+    onSuccess: (data: Post) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] })
+      addPost(data)
       setShowAddDialog(false)
       setNewPost({ title: "", body: "", userId: 1 })
     },
@@ -89,16 +97,18 @@ const PostsManager = () => {
 
   const updatePostMutation = useMutation({
     mutationFn: ({ id, post }: { id: number; post: Partial<Post> }) => postApi.updatePost(id, post),
-    onSuccess: () => {
+    onSuccess: (data: Post) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] })
+      updatePost(data)
       setShowEditDialog(false)
     },
   })
 
   const deletePostMutation = useMutation({
     mutationFn: postApi.deletePost,
-    onSuccess: () => {
+    onSuccess: (_, postId: number) => {
       queryClient.invalidateQueries({ queryKey: ["posts"] })
+      deletePost(postId)
     },
   })
 
@@ -147,7 +157,10 @@ const PostsManager = () => {
   }
 
   const handlePostChange = (field: string, value: string) => {
-    setSelectedPost((prev) => (prev ? { ...prev, [field]: value } : null))
+    if (selectedPost) {
+      const updatedPost = { ...selectedPost, [field]: value }
+      updatePost(updatedPost)
+    }
   }
 
   const handleNewCommentChange = (field: string, value: string | number) => {
@@ -172,7 +185,13 @@ const PostsManager = () => {
     setSelectedTag(params.get("tag") || "")
   }, [location.search])
 
-  const posts = searchQuery ? searchData?.posts : postsData?.posts
+  useEffect(() => {
+    if (postsData?.posts) {
+      setPosts(postsData.posts)
+    }
+  }, [postsData, setPosts])
+
+  const displayedPosts = searchQuery ? searchData?.posts : storePosts
   const total = searchQuery ? searchData?.total : postsData?.total
   const isLoading = isPostsLoading || isSearchLoading
 
@@ -215,7 +234,7 @@ const PostsManager = () => {
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
             <PostTable
-              posts={posts || []}
+              posts={displayedPosts || []}
               selectedPost={selectedPost}
               setSelectedPost={setSelectedPost}
               setShowPostDetailDialog={setShowPostDetailDialog}

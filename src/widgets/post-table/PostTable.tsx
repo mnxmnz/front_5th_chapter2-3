@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react"
 import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../shared/ui"
 import { Post, User } from "../../entities/post"
@@ -9,7 +8,7 @@ import { userApi } from "../../services/api"
 interface PostTableProps {
   posts: Post[]
   selectedPost: Post | null
-  setSelectedPost: Dispatch<SetStateAction<Post | null>>
+  setSelectedPost: (post: Post | null) => void
   setShowPostDetailDialog: (show: boolean) => void
   setSelectedUser: (user: User | null) => void
   setShowUserModal: (show: boolean) => void

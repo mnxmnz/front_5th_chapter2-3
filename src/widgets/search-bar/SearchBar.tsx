@@ -1,6 +1,6 @@
 import { Search } from "lucide-react"
 
-import { Input } from "../shared/ui"
+import { Input } from "../../shared/ui"
 
 interface Post {
   id: number

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea, Button } from "../shared/ui"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea, Button } from "../../../shared/ui"
 
 interface AddPostDialogProps {
   isOpen: boolean

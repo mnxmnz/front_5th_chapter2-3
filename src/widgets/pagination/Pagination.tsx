@@ -1,4 +1,4 @@
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../shared/ui"
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../shared/ui"
 
 interface PaginationProps {
   limit: number
@@ -13,7 +13,7 @@ const Pagination = ({ limit, skip, total, onLimitChange, onSkipChange }: Paginat
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
         <span>표시</span>
-        <Select value={limit.toString()} onValueChange={(value) => onLimitChange(Number(value))}>
+        <Select value={limit.toString()} onValueChange={(value: string) => onLimitChange(Number(value))}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="10" />
           </SelectTrigger>

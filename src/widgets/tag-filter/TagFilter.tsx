@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../shared/ui"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../shared/ui"
 
 interface TagFilterProps {
   selectedTag: string

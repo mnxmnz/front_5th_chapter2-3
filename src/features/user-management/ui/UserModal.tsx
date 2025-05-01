@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../shared/ui"
-import { User } from "../types/post"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui"
+import { User } from "../../../entities/post"
 
 interface UserModalProps {
   isOpen: boolean

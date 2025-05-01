@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Textarea, Button } from "../shared/ui"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Textarea, Button } from "../../../shared/ui"
 
 interface EditCommentDialogProps {
   isOpen: boolean

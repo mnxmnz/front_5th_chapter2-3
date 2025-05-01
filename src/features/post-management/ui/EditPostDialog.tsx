@@ -1,5 +1,5 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea, Button } from "../shared/ui"
-import { Post } from "../types/post"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea, Button } from "../../../shared/ui"
+import { Post } from "../../../entities/post"
 
 interface EditPostDialogProps {
   isOpen: boolean

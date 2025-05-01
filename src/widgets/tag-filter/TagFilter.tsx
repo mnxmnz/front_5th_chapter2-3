@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 interface TagFilterProps {
   selectedTag: string
   setSelectedTag: (tag: string) => void
-  fetchPostsByTag: (tag: string) => void
   updateURL: () => void
 }
 
@@ -13,7 +12,7 @@ interface Tag {
   slug: string
 }
 
-const TagFilter = ({ selectedTag, setSelectedTag, fetchPostsByTag, updateURL }: TagFilterProps) => {
+const TagFilter = ({ selectedTag, setSelectedTag, updateURL }: TagFilterProps) => {
   const [tags, setTags] = useState<Tag[]>([])
 
   const fetchTags = async () => {
@@ -35,7 +34,6 @@ const TagFilter = ({ selectedTag, setSelectedTag, fetchPostsByTag, updateURL }: 
       value={selectedTag}
       onValueChange={(value) => {
         setSelectedTag(value)
-        fetchPostsByTag(value)
         updateURL()
       }}
     >

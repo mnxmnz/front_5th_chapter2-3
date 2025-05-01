@@ -30,3 +30,12 @@ export interface Post {
   }
   author?: User
 }
+
+export interface Comment {
+  id: number
+  body: string
+  postId: number
+  userId: number
+  user?: User
+  likes: number
+}

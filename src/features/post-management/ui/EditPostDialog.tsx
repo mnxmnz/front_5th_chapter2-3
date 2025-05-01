@@ -4,12 +4,14 @@ import { Post } from "../../../entities/post"
 interface EditPostDialogProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
-  selectedPost: Post | null
+  post: Post | null
   onPostChange: (field: string, value: string) => void
   onUpdatePost: () => void
 }
 
-const EditPostDialog = ({ isOpen, onOpenChange, selectedPost, onPostChange, onUpdatePost }: EditPostDialogProps) => {
+const EditPostDialog = ({ isOpen, onOpenChange, post, onPostChange, onUpdatePost }: EditPostDialogProps) => {
+  if (!post) return null
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -17,18 +19,15 @@ const EditPostDialog = ({ isOpen, onOpenChange, selectedPost, onPostChange, onUp
           <DialogTitle>게시물 수정</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <Input
-            placeholder="제목"
-            value={selectedPost?.title || ""}
-            onChange={(e) => onPostChange("title", e.target.value)}
-          />
-          <Textarea
-            rows={15}
-            placeholder="내용"
-            value={selectedPost?.body || ""}
-            onChange={(e) => onPostChange("body", e.target.value)}
-          />
-          <Button onClick={onUpdatePost}>게시물 업데이트</Button>
+          <div className="space-y-2">
+            <label htmlFor="title">제목</label>
+            <Input id="title" value={post.title} onChange={(e) => onPostChange("title", e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <label htmlFor="body">내용</label>
+            <Textarea id="body" value={post.body} onChange={(e) => onPostChange("body", e.target.value)} />
+          </div>
+          <Button onClick={onUpdatePost}>수정</Button>
         </div>
       </DialogContent>
     </Dialog>

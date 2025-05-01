@@ -6,10 +6,8 @@ import React from "react"
 
 interface PostTableProps {
   posts: Post[]
-  setPosts: Dispatch<SetStateAction<Post[]>>
   selectedPost: Post | null
   setSelectedPost: Dispatch<SetStateAction<Post | null>>
-  fetchComments: (postId: number) => void
   setShowPostDetailDialog: (show: boolean) => void
   setSelectedUser: (user: User | null) => void
   setShowUserModal: (show: boolean) => void
@@ -19,13 +17,12 @@ interface PostTableProps {
   updateURL: () => void
   setShowEditDialog: (show: boolean) => void
   searchQuery: string
+  onDeletePost: (id: number) => void
 }
 
 const PostTable = ({
   posts,
-  setPosts,
   setSelectedPost,
-  fetchComments,
   setShowPostDetailDialog,
   setSelectedUser,
   setShowUserModal,
@@ -35,21 +32,10 @@ const PostTable = ({
   updateURL,
   setShowEditDialog,
   searchQuery,
+  onDeletePost,
 }: PostTableProps) => {
-  const deletePost = async (id: number) => {
-    try {
-      await fetch(`/api/posts/${id}`, {
-        method: "DELETE",
-      })
-      setPosts(posts.filter((post) => post.id !== id))
-    } catch (error) {
-      console.error("게시물 삭제 오류:", error)
-    }
-  }
-
   const openPostDetail = (post: Post) => {
     setSelectedPost(post)
-    fetchComments(post.id)
     setShowPostDetailDialog(true)
   }
 
@@ -135,7 +121,7 @@ const PostTable = ({
                 >
                   <Edit2 className="w-4 h-4" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => deletePost(post.id)}>
+                <Button variant="ghost" size="sm" onClick={() => onDeletePost(post.id)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </div>
